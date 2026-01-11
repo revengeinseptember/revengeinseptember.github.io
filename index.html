@@ -28,6 +28,7 @@ html, body {
   gap: 80px;
 }
 
+/* Zine cards (no borders, transparency-safe) */
 .zine-card {
   text-align: center;
   cursor: pointer;
@@ -35,6 +36,9 @@ html, body {
 
 .zine-card img {
   width: 280px;
+  border: none;
+  outline: none;
+  background: none;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -56,10 +60,6 @@ html, body {
 }
 
 /* Download image */
-#download {
-  margin-top: 20px;
-}
-
 #download img {
   width: 180px;
   opacity: 0.85;
@@ -77,6 +77,12 @@ html, body {
   position: fixed;
   inset: 0;
   background: black;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+#zineView.visible {
+  opacity: 1;
 }
 
 .page {
@@ -94,14 +100,14 @@ html, body {
   opacity: 1;
 }
 
-/* Arrows (desktop) */
+/* Arrows */
 .arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   font-size: 42px;
   color: white;
-  opacity: 0.3;
+  opacity: 0.25;
   cursor: pointer;
   user-select: none;
   z-index: 10;
@@ -185,19 +191,18 @@ html, body {
 <div id="frontpage">
   <div id="zineRow">
     <div class="zine-card" onclick="openZine(1)">
-      <img src="zine1_cover.jpg">
+      <img src="zine1_cover.png">
       <div class="zine-title">Zine One</div>
     </div>
 
     <div class="zine-card" onclick="openZine(2)">
-      <img src="zine2_cover.jpg">
+      <img src="zine2_cover.png">
       <div class="zine-title">Zine Two</div>
     </div>
   </div>
 
-  <!-- Download -->
   <a id="download" href="zine_bundle.zip" download>
-    <img src="download_image.jpg">
+    <img src="download_image.png">
   </a>
 </div>
 
@@ -222,12 +227,15 @@ const zines = {
 };
 
 function openZine(num) {
-  document.getElementById("frontpage").style.display = "none";
-  document.getElementById("zineView").style.display = "block";
-
+  const front = document.getElementById("frontpage");
   const view = document.getElementById("zineView");
-  view.querySelectorAll(".page").forEach(p => p.remove());
 
+  front.style.display = "none";
+  view.style.display = "block";
+
+  requestAnimationFrame(() => view.classList.add("visible"));
+
+  view.querySelectorAll(".page").forEach(p => p.remove());
   pages = [];
   current = 0;
 
@@ -270,11 +278,16 @@ function prev() {
 }
 
 function goBack() {
-  document.getElementById("zineView").style.display = "none";
-  document.getElementById("frontpage").style.display = "flex";
+  const view = document.getElementById("zineView");
+  view.classList.remove("visible");
+
+  setTimeout(() => {
+    view.style.display = "none";
+    document.getElementById("frontpage").style.display = "flex";
+  }, 400);
 }
 
-/* Swipe support (mobile) */
+/* Swipe for mobile */
 document.getElementById("zineView").addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
 });
