@@ -2,25 +2,67 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Zine</title>
+<title>Zines</title>
 
 <style>
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: black;
-  overflow: hidden;
+  font-family: Arial, sans-serif;
 }
 
-/* Pages */
+/* ---------- FRONT PAGE ---------- */
+#frontpage {
+  background: #f5f3ef; /* eggshell */
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 80px;
+}
+
+.zine-card {
+  text-align: center;
+  cursor: pointer;
+}
+
+.zine-card img {
+  width: 300px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.zine-card:hover img {
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+.zine-title {
+  margin-top: 12px;
+  font-size: 18px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.zine-card:hover .zine-title {
+  opacity: 1;
+}
+
+/* ---------- ZINE VIEW ---------- */
+#zineView {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: black;
+}
+
 .page {
   position: absolute;
   inset: 0;
   background-size: cover;
   background-position: center;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s;
 }
 
 .page.active {
@@ -37,7 +79,6 @@ html, body {
   background: rgba(0,0,0,0.4);
   padding: 10px 18px;
   cursor: pointer;
-  user-select: none;
 }
 
 .arrow:hover {
@@ -68,36 +109,97 @@ html, body {
 .dot.active {
   background: white;
 }
+
+/* Back button */
+#backBtn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+#backBtn:hover {
+  opacity: 1;
+}
 </style>
 </head>
 
 <body>
 
-<!-- Page 1 -->
-<div class="page active" style="background-image: url('page1.jpg');"></div>
+<!-- FRONT PAGE -->
+<div id="frontpage">
+  <div class="zine-card" onclick="openZine(1)">
+    <img src="zine1_cover.jpg">
+    <div class="zine-title">Zine One</div>
+  </div>
 
-<!-- Page 2 -->
-<div class="page" style="background-image: url('page2.jpg');"></div>
+  <div class="zine-card" onclick="openZine(2)">
+    <img src="zine2_cover.jpg">
+    <div class="zine-title">Zine Two</div>
+  </div>
+</div>
 
-<!-- Arrows -->
-<div class="arrow left" onclick="prev()">‹</div>
-<div class="arrow right" onclick="next()">›</div>
+<!-- ZINE VIEW -->
+<div id="zineView">
+  <div id="backBtn" onclick="goBack()">← Back</div>
 
-<!-- Dots -->
-<div class="dots">
-  <span class="dot active" onclick="goTo(0)"></span>
-  <span class="dot" onclick="goTo(1)"></span>
+  <div class="arrow left" onclick="prev()">‹</div>
+  <div class="arrow right" onclick="next()">›</div>
+
+  <div class="dots" id="dots"></div>
 </div>
 
 <script>
-const pages = document.querySelectorAll('.page');
-const dots = document.querySelectorAll('.dot');
+let pages = [];
 let current = 0;
 
-function show(index) {
-  pages.forEach((p, i) => p.classList.toggle('active', i === index));
-  dots.forEach((d, i) => d.classList.toggle('active', i === index));
-  current = index;
+const zines = {
+  1: ["zine1_page1.jpg", "zine1_page2.jpg"],
+  2: ["zine2_page1.jpg", "zine2_page2.jpg"]
+};
+
+function openZine(num) {
+  document.getElementById("frontpage").style.display = "none";
+  document.getElementById("zineView").style.display = "block";
+
+  const view = document.getElementById("zineView");
+  view.querySelectorAll(".page").forEach(p => p.remove());
+
+  pages = [];
+  current = 0;
+
+  zines[num].forEach((img, i) => {
+    const page = document.createElement("div");
+    page.className = "page" + (i === 0 ? " active" : "");
+    page.style.backgroundImage = `url('${img}')`;
+    view.appendChild(page);
+    pages.push(page);
+  });
+
+  renderDots();
+}
+
+function renderDots() {
+  const dots = document.getElementById("dots");
+  dots.innerHTML = "";
+  pages.forEach((_, i) => {
+    const dot = document.createElement("span");
+    dot.className = "dot" + (i === 0 ? " active" : "");
+    dot.onclick = () => show(i);
+    dots.appendChild(dot);
+  });
+}
+
+function show(i) {
+  pages.forEach((p, idx) => p.classList.toggle("active", idx === i));
+  document.querySelectorAll(".dot").forEach((d, idx) =>
+    d.classList.toggle("active", idx === i)
+  );
+  current = i;
 }
 
 function next() {
@@ -108,8 +210,9 @@ function prev() {
   show((current - 1 + pages.length) % pages.length);
 }
 
-function goTo(index) {
-  show(index);
+function goBack() {
+  document.getElementById("zineView").style.display = "none";
+  document.getElementById("frontpage").style.display = "flex";
 }
 </script>
 
