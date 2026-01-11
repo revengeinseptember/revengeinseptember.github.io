@@ -1,20 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <title>My Page</title>
+  <style>
+    /* Make the page fill the screen */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    /* Background image takes full page */
+    body {
+      background: url('image.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center; /* center horizontally */
+      align-items: center;    /* center vertically */
+      font-family: Arial, sans-serif;
+    }
+
+    /* Download link styling */
+    .download-button {
+      padding: 15px 30px;
+      background: rgba(0,0,0,0.6); /* semi-transparent dark */
+      color: white;
+      font-size: 20px;
+      text-decoration: none;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .download-button:hover {
+      background: rgba(0,0,0,0.8);
+    }
+  </style>
 </head>
 <body>
-
-  <h1>Welcome</h1>
-
-  <p>This is my website.</p>
-
-  <img src="image.jpg" width="300">
-
-  <br><br>
-
-  <a href="download.zip" download>Download</a>
-
+  <a class="download-button" href="download.zip" download>Download</a>
 </body>
 </html>
