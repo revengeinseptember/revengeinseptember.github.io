@@ -79,6 +79,7 @@ html, body {
   background: black;
   opacity: 0;
   transition: opacity 0.4s ease;
+  overflow: hidden;
 }
 
 #zineView.visible {
@@ -89,21 +90,26 @@ html, body {
   position: absolute;
   top: 50%;
   left: 50%;
-  max-width: 90%;
-  max-height: 90%;
+  width: 90vw;
+  height: 90vh;
   transform: translate(-50%, -50%);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
-  z-index: 1;
-  background-color: #666; /* fallback if image missing */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .page.active {
   opacity: 1;
+  pointer-events: auto;
+}
+
+.page img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 /* Arrows */
@@ -228,95 +234,4 @@ window.onload = function() {
 
   const zines = {
     1: ["zine1_page1.jpg", "zine1_page2.jpg"],
-    2: ["zine2_page1.jpg", "zine2_page2.jpg"]
-  };
-
-  const frontPage = document.getElementById("frontpage");
-  const zineView = document.getElementById("zineView");
-  const backBtn = document.getElementById("backBtn");
-  const leftArrow = zineView.querySelector(".arrow.left");
-  const rightArrow = zineView.querySelector(".arrow.right");
-
-  // FRONT PAGE BUTTONS
-  document.getElementById("zine1Card").addEventListener("click", () => openZine(1));
-  document.getElementById("zine2Card").addEventListener("click", () => openZine(2));
-
-  // BACK BUTTON
-  backBtn.addEventListener("click", goBack);
-
-  // ARROWS
-  leftArrow.addEventListener("click", prev);
-  rightArrow.addEventListener("click", next);
-
-  // OPEN ZINE
-  function openZine(num) {
-    frontPage.style.display = "none";
-    zineView.style.display = "block";
-    requestAnimationFrame(() => zineView.classList.add("visible"));
-
-    zineView.querySelectorAll(".page").forEach(p => p.remove());
-    pages = [];
-    current = 0;
-
-    zines[num].forEach((img, i) => {
-      const page = document.createElement("div");
-      page.className = "page" + (i === 0 ? " active" : "");
-      page.style.backgroundImage = `url('${img}')`;
-
-      // Fallback in case image fails
-      page.onerror = function() {
-        page.style.backgroundColor = "#444";
-      };
-
-      zineView.appendChild(page);
-      pages.push(page);
-      console.log("Loaded page:", img);
-    });
-
-    renderDots();
-  }
-
-  // RENDER DOTS
-  function renderDots() {
-    const dots = document.getElementById("dots");
-    dots.innerHTML = "";
-    pages.forEach((_, i) => {
-      const dot = document.createElement("span");
-      dot.className = "dot" + (i === 0 ? " active" : "");
-      dot.onclick = () => show(i);
-      dots.appendChild(dot);
-    });
-  }
-
-  // SHOW PAGE
-  function show(i) {
-    pages.forEach((p, idx) => p.classList.toggle("active", idx === i));
-    document.querySelectorAll(".dot").forEach((d, idx) => d.classList.toggle("active", idx === i));
-    current = i;
-  }
-
-  // NEXT/PREV
-  function next() { show((current + 1) % pages.length); }
-  function prev() { show((current - 1 + pages.length) % pages.length); }
-
-  // GO BACK
-  function goBack() {
-    zineView.classList.remove("visible");
-    setTimeout(() => {
-      zineView.style.display = "none";
-      frontPage.style.display = "flex";
-    }, 400);
-  }
-
-  // SWIPE FOR MOBILE
-  zineView.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-  zineView.addEventListener("touchend", e => {
-    const endX = e.changedTouches[0].clientX;
-    if (startX - endX > 50) next();
-    if (endX - startX > 50) prev();
-  });
-};
-</script>
-
-</body>
-</html>
+    2: ["zine2_page_]()
