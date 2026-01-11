@@ -13,7 +13,7 @@ html, body {
   background: #f5f3ef;
 }
 
-/* ---------- FRONT PAGE ---------- */
+/* FRONT PAGE */
 #frontpage {
   height: 100%;
   display: flex;
@@ -71,7 +71,7 @@ html, body {
   transform: scale(1.03);
 }
 
-/* ---------- ZINE VIEW ---------- */
+/* ZINE VIEW */
 #zineView {
   display: none;
   position: fixed;
@@ -166,7 +166,7 @@ html, body {
   opacity: 1;
 }
 
-/* ---------- MOBILE ---------- */
+/* MOBILE */
 @media (max-width: 768px) {
   #zineRow {
     overflow-x: auto;
@@ -195,29 +195,27 @@ html, body {
 <!-- FRONT PAGE -->
 <div id="frontpage">
   <div id="zineRow">
-    <div class="zine-card" onclick="openZine(1)">
-      <img src="zine1_cover.jpg">
+    <div class="zine-card" id="zine1Card">
+      <img src="zine1_cover.jpg" alt="Zine One">
       <div class="zine-title">Zine One</div>
     </div>
 
-    <div class="zine-card" onclick="openZine(2)">
-      <img src="zine2_cover.jpg">
+    <div class="zine-card" id="zine2Card">
+      <img src="zine2_cover.jpg" alt="Zine Two">
       <div class="zine-title">Zine Two</div>
     </div>
   </div>
 
   <a id="download" href="zine_bundle.zip" download>
-    <img src="download_image.jpg">
+    <img src="download_image.jpg" alt="Download">
   </a>
 </div>
 
 <!-- ZINE VIEW -->
 <div id="zineView">
-  <div id="backBtn" onclick="goBack()">← Back</div>
-
-  <div class="arrow left" onclick="prev()">‹</div>
-  <div class="arrow right" onclick="next()">›</div>
-
+  <div id="backBtn">← Back</div>
+  <div class="arrow left">‹</div>
+  <div class="arrow right">›</div>
   <div class="dots" id="dots"></div>
 </div>
 
@@ -231,16 +229,30 @@ const zines = {
   2: ["zine2_page1.jpg", "zine2_page2.jpg"]
 };
 
+const frontPage = document.getElementById("frontpage");
+const zineView = document.getElementById("zineView");
+const backBtn = document.getElementById("backBtn");
+const leftArrow = zineView.querySelector(".arrow.left");
+const rightArrow = zineView.querySelector(".arrow.right");
+
+// FRONT PAGE BUTTONS
+document.getElementById("zine1Card").addEventListener("click", () => openZine(1));
+document.getElementById("zine2Card").addEventListener("click", () => openZine(2));
+
+// BACK BUTTON
+backBtn.addEventListener("click", goBack);
+
+// ARROWS
+leftArrow.addEventListener("click", prev);
+rightArrow.addEventListener("click", next);
+
+// OPEN ZINE
 function openZine(num) {
-  const front = document.getElementById("frontpage");
-  const view = document.getElementById("zineView");
+  frontPage.style.display = "none";
+  zineView.style.display = "block";
+  requestAnimationFrame(() => zineView.classList.add("visible"));
 
-  front.style.display = "none";
-  view.style.display = "block";
-
-  requestAnimationFrame(() => view.classList.add("visible"));
-
-  view.querySelectorAll(".page").forEach(p => p.remove());
+  zineView.querySelectorAll(".page").forEach(p => p.remove());
   pages = [];
   current = 0;
 
@@ -248,13 +260,14 @@ function openZine(num) {
     const page = document.createElement("div");
     page.className = "page" + (i === 0 ? " active" : "");
     page.style.backgroundImage = `url('${img}')`;
-    view.appendChild(page);
+    zineView.appendChild(page);
     pages.push(page);
   });
 
   renderDots();
 }
 
+// RENDER DOTS
 function renderDots() {
   const dots = document.getElementById("dots");
   dots.innerHTML = "";
@@ -266,27 +279,34 @@ function renderDots() {
   });
 }
 
+// SHOW PAGE
 function show(i) {
   pages.forEach((p, idx) => p.classList.toggle("active", idx === i));
-  document.querySelectorAll(".dot").forEach((d, idx) =>
-    d.classList.toggle("active", idx === i)
-  );
+  document.querySelectorAll(".dot").forEach((d, idx) => d.classList.toggle("active", idx === i));
   current = i;
 }
 
-function next() {
-  show((current + 1) % pages.length);
-}
+// NEXT/PREV
+function next() { show((current + 1) % pages.length); }
+function prev() { show((current - 1 + pages.length) % pages.length); }
 
-function prev() {
-  show((current - 1 + pages.length) % pages.length);
-}
-
+// GO BACK
 function goBack() {
-  const view = document.getElementById("zineView");
-  view.classList.remove("visible");
-
+  zineView.classList.remove("visible");
   setTimeout(() => {
-    view.style.display = "none";
-    document.getElementById("frontpage").style.display = "flex";
-  }
+    zineView.style.display = "none";
+    frontPage.style.display = "flex";
+  }, 400);
+}
+
+// SWIPE FOR MOBILE
+zineView.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+zineView.addEventListener("touchend", e => {
+  const endX = e.changedTouches[0].clientX;
+  if (startX - endX > 50) next();
+  if (endX - startX > 50) prev();
+});
+</script>
+
+</body>
+</html>
