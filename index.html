@@ -1,3 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>revengeinseptember</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  background: #f6f4ef;
+  color: #111;
+  overflow: hidden;
+}
+
+/* ---------- FRONT ---------- */
+
+#front {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 80px;
+}
+
+.icon {
+  width: 200px;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+/* ---------- ZINE ---------- */
+
+#zine {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #111;
+}
+
+#back {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  color: white;
+  z-index: 10;
+}
+
+#back:hover {
+  opacity: 1;
+}
+
+#page-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.page {
+  display: none;
+  max-width: 90vw;
+  max-height: 90vh;
+}
 
 .page.active {
   display: block;
