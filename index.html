@@ -210,18 +210,36 @@ for (let i = 1; i <= 8; i++) {
   dots.appendChild(dot);
 }
 
-/* VIDEO PAGE 9 */
+/* VIDEO PAGE 9 (lazy-loaded) */
 const videoPage = document.createElement("div");
 videoPage.className = "page video-page";
-videoPage.innerHTML = `
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/PzruFL1rGsU"
-    title="video"
-    allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
-    referrerpolicy="strict-origin-when-cross-origin"
-    allowfullscreen>
-  </iframe>
-`;
+container.appendChild(videoPage);
+pages.push(videoPage);
+
+const videoDot = document.createElement("div");
+videoDot.className = "dot";
+dots.appendChild(videoDot);
+
+let videoLoaded = false;
+
+function loadVideo() {
+  if (videoLoaded) return;
+  videoPage.innerHTML = `
+    <iframe
+      src="https://www.youtube-nocookie.com/embed/watch?v=PzruFL1rGsU?autoplay=1"
+      title="video"
+      allow="autoplay; encrypted-media; picture-in-picture"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen>
+    </iframe>
+  `;
+  videoLoaded = true;
+}
+
+function unloadVideo() {
+  videoPage.innerHTML = "";
+  videoLoaded = false;
+}
 container.appendChild(videoPage);
 pages.push(videoPage);
 
@@ -231,13 +249,24 @@ dots.appendChild(videoDot);
 
 /* page switching */
 function showPage(i) {
+  // unload video if leaving page 9
+  if (current === 8 && i !== 8) {
+    unloadVideo();
+  }
+
   pages[current].classList.remove("active");
   dots.children[current].classList.remove("active");
+
   current = i;
+
   pages[current].classList.add("active");
   dots.children[current].classList.add("active");
-}
 
+  // load video ONLY on page 9
+  if (current === 8) {
+    loadVideo();
+  }
+}
 /* open zine */
 document.getElementById("openZine").onclick = () => {
   front.classList.remove("show");
