@@ -6,143 +6,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; font-family:sans-serif; background:#f6f4ef; }
 
-html, body {
-  width: 100%;
-  height: 100%;
-  font-family: sans-serif;
-  background: #f6f4ef;
-}
+/* FADE */
+.fade { opacity:0; pointer-events:none; transition: opacity 0.4s ease; }
+.fade.show { opacity:1; pointer-events:auto; }
 
-/* ---------- FADE SYSTEM ---------- */
-.fade {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
-
-.fade.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* ---------- FRONT PAGE ---------- */
+/* FRONT PAGE */
 #front {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 80px;
+  position: fixed; inset:0;
+  display:flex; justify-content:center; align-items:center; gap:80px;
 }
-
 .icon {
-  width: 200px;
-  cursor: pointer;
+  width:200px; cursor:pointer;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+.icon:hover { transform: scale(1.05); box-shadow:0 12px 30px rgba(0,0,0,0.12); }
 
-.icon:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-}
-
-/* ---------- ZINE ---------- */
-#zine {
-  position: fixed;
-  inset: 0;
-  background: #111;
-}
-
-#back {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  color: white;
-  opacity: 0.5;
-  cursor: pointer;
-  z-index: 20;
-  transition: opacity 0.2s ease;
-}
-
-#back:hover {
-  opacity: 1;
-}
-
-#page-container {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* pages */
-.page {
-  position: absolute;
-  max-width: 90vw;
-  max-height: 90vh;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.page.active {
-  opacity: 1;
-}
+/* ZINE */
+#zine { position:fixed; inset:0; background:#111; display:none; }
+#back { position:absolute; top:20px; left:20px; color:white; opacity:0.5; cursor:pointer; z-index:20; transition:opacity 0.2s ease; }
+#back:hover { opacity:1; }
+#page-container { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; }
+.page { position:absolute; max-width:90vw; max-height:90vh; opacity:0; transition: opacity 0.4s ease; }
+.page.active { opacity:1; }
 
 /* arrows */
-.arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 48px;
-  color: white;
-  cursor: pointer;
-  opacity: 0.6;
-  user-select: none;
-  z-index: 20;
-}
-
-.arrow:hover {
-  opacity: 1;
-}
-
-#prev { left: 20px; }
-#next { right: 20px; }
+.arrow { position:absolute; top:50%; transform:translateY(-50%); font-size:48px; color:white; cursor:pointer; opacity:0.6; user-select:none; z-index:20; }
+.arrow:hover { opacity:1; }
+#prev { left:20px; } #next { right:20px; }
 
 /* dots */
-#dots {
-  position: absolute;
-  bottom: 30px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #555;
-}
-
-.dot.active {
-  background: white;
-}
+#dots { position:absolute; bottom:30px; width:100%; display:flex; justify-content:center; gap:10px; }
+.dot { width:8px; height:8px; border-radius:50%; background:#555; }
+.dot.active { background:white; }
 
 /* mobile */
-@media (max-width: 768px) {
-  #front {
-    flex-direction: column;
-    gap: 40px;
-  }
-}
+@media (max-width:768px) { #front { flex-direction:column; gap:40px; } }
 </style>
 </head>
 
@@ -160,12 +61,9 @@ html, body {
 <!-- ZINE -->
 <div id="zine" class="fade">
   <div id="back">← back</div>
-
   <div id="page-container"></div>
-
   <div id="prev" class="arrow">‹</div>
   <div id="next" class="arrow">›</div>
-
   <div id="dots"></div>
 </div>
 
@@ -179,73 +77,68 @@ const totalPages = 8;
 let current = 0;
 const pages = [];
 
-/* create image pages */
-for (let i = 1; i <= totalPages; i++) {
-  const img = document.createElement("img");
-  img.src = `page${String(i).padStart(2, "0")}.png`;
-  img.className = "page";
-  if (i === 1) img.classList.add("active");
+/* CREATE IMAGE PAGES */
+for(let i=1;i<=totalPages;i++){
+  const img=document.createElement("img");
+  img.src=`page${String(i).padStart(2,"0")}.png`;
+  img.className="page";
+  if(i===1) img.classList.add("active");
   container.appendChild(img);
   pages.push(img);
 
-  const dot = document.createElement("div");
-  dot.className = "dot" + (i === 1 ? " active" : "");
+  const dot=document.createElement("div");
+  dot.className="dot"+(i===1?" active":"");
   dots.appendChild(dot);
 }
 
-/* page switching */
-function showPage(i) {
+/* SHOW PAGE */
+function showPage(i){
   pages[current].classList.remove("active");
   dots.children[current].classList.remove("active");
-  current = i;
+  current=i;
   pages[current].classList.add("active");
   dots.children[current].classList.add("active");
 }
 
-/* open zine */
-document.getElementById("openZine").onclick = () => {
+/* OPEN ZINE */
+document.getElementById("openZine").onclick=()=>{
   front.classList.remove("show");
-  setTimeout(() => {
-    front.style.display = "none";
-    zine.style.display = "block";
+  setTimeout(()=>{
+    front.style.display="none";
+    zine.style.display="block";
     zine.classList.add("show");
-    current = 0;
+    current=0;
     showPage(0);
-  }, 400);
+  },400);
 };
 
-/* back */
-document.getElementById("back").onclick = () => {
+/* BACK BUTTON */
+document.getElementById("back").onclick=()=>{
   zine.classList.remove("show");
-  setTimeout(() => {
-    zine.style.display = "none";
-    front.style.display = "flex";
+  setTimeout(()=>{
+    zine.style.display="none";
+    front.style.display="flex";
     front.classList.add("show");
-  }, 400);
+  },400);
 };
 
-/* arrows */
-document.getElementById("next").onclick = () => {
-  if (current < totalPages - 1) showPage(current + 1);
-};
+/* ARROWS */
+document.getElementById("next").onclick=()=>{ if(current<totalPages-1) showPage(current+1); };
+document.getElementById("prev").onclick=()=>{ if(current>0) showPage(current-1); };
 
-document.getElementById("prev").onclick = () => {
-  if (current > 0) showPage(current - 1);
-};
-
-/* swipe for mobile */
-let startX = 0;
-container.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-container.addEventListener("touchend", e => {
-  const dx = e.changedTouches[0].clientX - startX;
-  if (dx > 50 && current > 0) showPage(current - 1);
-  if (dx < -50 && current < totalPages - 1) showPage(current + 1);
+/* SWIPE */
+let startX=0;
+container.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
+container.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-startX;
+  if(dx>50 && current>0) showPage(current-1);
+  if(dx<-50 && current<totalPages-1) showPage(current+1);
 });
 
-/* download button using Dropbox direct link */
-document.getElementById("downloadBtn").onclick = () => {
-  document.getElementById("downloadFrame").src =
-    "https://www.dropbox.com/scl/fi/s21r42c7zwk4q68bsyip8/DREAMCRUSHER-DRAFTS.zip?rlkey=8txvv6q6zrvv8ifzwgwap4wjd&st=qp2ytjjs&dl=1;
+/* DROPBOX DOWNLOAD */
+document.getElementById("downloadBtn").onclick=()=>{
+  // REPLACE THIS LINK WITH YOUR DROPBOX DIRECT LINK (?dl=1)
+  document.getElementById("downloadFrame").src="https://www.dropbox.com/scl/fo/l2idoaz8ru2c4qad4s0zn/AH8y0o_2XDwh6r9xxzM3EO4?rlkey=4amv3cp3s22f6ojjzw5kpw2a1&st=m9zfzatn&dl=0";
 };
 </script>
 
