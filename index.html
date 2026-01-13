@@ -215,7 +215,10 @@ const videoPage = document.createElement("div");
 videoPage.className = "page video-page";
 videoPage.innerHTML = `
   <iframe
-    src="https://www.youtube.com/watch?v=PzruFL1rGsU"
+    src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+    title="youtube video"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
     allowfullscreen>
   </iframe>
 `;
@@ -278,7 +281,7 @@ container.addEventListener("touchend", e => {
 /* download (no navigation) */
 document.getElementById("downloadBtn").onclick = () => {
   document.getElementById("downloadFrame").src =
-    "https://YOUR-DOWNLOAD-LINK-HERE";
+    "https://drive.google.com/file/d/1bQDAi7W5Ne57PVhnjWVZ8SS46Us5LgeA/view";
 };
 </script>
 
