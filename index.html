@@ -98,8 +98,8 @@ html, body {
   opacity: 1;
 }
 
-/* video page */
-.video-page iframe {
+/* video */
+.video iframe {
   width: 80vw;
   height: 45vw;
   max-width: 960px;
@@ -155,7 +155,7 @@ html, body {
     gap: 40px;
   }
 
-  .video-page iframe {
+  .video iframe {
     width: 90vw;
     height: 50vw;
   }
@@ -165,7 +165,7 @@ html, body {
 
 <body>
 
-<!-- hidden iframe for download -->
+<!-- hidden iframe for downloads -->
 <iframe id="downloadFrame" style="display:none;"></iframe>
 
 <!-- FRONT -->
@@ -192,11 +192,11 @@ const zine = document.getElementById("zine");
 const container = document.getElementById("page-container");
 const dots = document.getElementById("dots");
 
-const totalPages = 9;
+const TOTAL_PAGES = 9; // 8 images + 1 video
 let current = 0;
 const pages = [];
 
-/* IMAGE PAGES 1–8 */
+/* ---------- BUILD IMAGE PAGES ---------- */
 for (let i = 1; i <= 8; i++) {
   const img = document.createElement("img");
   img.src = `page${String(i).padStart(2, "0")}.png`;
@@ -210,9 +210,9 @@ for (let i = 1; i <= 8; i++) {
   dots.appendChild(dot);
 }
 
-/* VIDEO PAGE 9 (lazy-loaded) */
+/* ---------- VIDEO PAGE (EMPTY UNTIL ACTIVE) ---------- */
 const videoPage = document.createElement("div");
-videoPage.className = "page video-page";
+videoPage.className = "page video";
 container.appendChild(videoPage);
 pages.push(videoPage);
 
@@ -220,54 +220,37 @@ const videoDot = document.createElement("div");
 videoDot.className = "dot";
 dots.appendChild(videoDot);
 
-let videoLoaded = false;
-
-function loadVideo() {
-  if (videoLoaded) return;
-  videoPage.innerHTML = `
-    <iframe
-      src="https://www.youtube-nocookie.com/embed/watch?v=PzruFL1rGsU?autoplay=1"
-      title="video"
-      allow="autoplay; encrypted-media; picture-in-picture"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen>
-    </iframe>
-  `;
-  videoLoaded = true;
-}
-
-function unloadVideo() {
-  videoPage.innerHTML = "";
-  videoLoaded = false;
-}
-container.appendChild(videoPage);
-pages.push(videoPage);
-
-const videoDot = document.createElement("div");
-videoDot.className = "dot";
-dots.appendChild(videoDot);
-
-/* page switching */
+/* ---------- PAGE SWITCHING ---------- */
 function showPage(i) {
-  // unload video if leaving page 9
-  if (current === 8 && i !== 8) {
-    unloadVideo();
-  }
-
+  // remove current
   pages[current].classList.remove("active");
   dots.children[current].classList.remove("active");
 
+  // if leaving video page, destroy iframe
+  if (current === 8) {
+    videoPage.innerHTML = "";
+  }
+
   current = i;
+
+  // if entering video page, create iframe
+  if (current === 8) {
+    videoPage.innerHTML = `
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/watch?v=PzruFL1rGsU"
+        title="video"
+        allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
+      </iframe>
+    `;
+  }
 
   pages[current].classList.add("active");
   dots.children[current].classList.add("active");
-
-  // load video ONLY on page 9
-  if (current === 8) {
-    loadVideo();
-  }
 }
-/* open zine */
+
+/* ---------- OPEN ZINE ---------- */
 document.getElementById("openZine").onclick = () => {
   front.classList.remove("show");
   setTimeout(() => {
@@ -279,7 +262,7 @@ document.getElementById("openZine").onclick = () => {
   }, 400);
 };
 
-/* back */
+/* ---------- BACK ---------- */
 document.getElementById("back").onclick = () => {
   zine.classList.remove("show");
   setTimeout(() => {
@@ -289,25 +272,25 @@ document.getElementById("back").onclick = () => {
   }, 400);
 };
 
-/* arrows */
+/* ---------- NAV ---------- */
 document.getElementById("next").onclick = () => {
-  if (current < totalPages - 1) showPage(current + 1);
+  if (current < TOTAL_PAGES - 1) showPage(current + 1);
 };
 
 document.getElementById("prev").onclick = () => {
   if (current > 0) showPage(current - 1);
 };
 
-/* swipe */
+/* ---------- SWIPE ---------- */
 let startX = 0;
 container.addEventListener("touchstart", e => startX = e.touches[0].clientX);
 container.addEventListener("touchend", e => {
   const dx = e.changedTouches[0].clientX - startX;
   if (dx > 50 && current > 0) showPage(current - 1);
-  if (dx < -50 && current < totalPages - 1) showPage(current + 1);
+  if (dx < -50 && current < TOTAL_PAGES - 1) showPage(current + 1);
 });
 
-/* download (no navigation) */
+/* ---------- DOWNLOAD ---------- */
 document.getElementById("downloadBtn").onclick = () => {
   document.getElementById("downloadFrame").src =
     "https://uc632625ed95ccaf7377f9e70e4f.dl.dropboxusercontent.com/cd/0/get/C40xDBUPVs6M8vxE-eGTHwi7i4vFnOxiy8AxOkrPSdoKi0avq0hutCJ50aqVNx0zX9fXWQv5m8v7iJE0Ku4EGDF-xgmnL3O0i9cgRUZVFsCcJKxr6FExZp5RxU7eVkCihypqJbZGgSOrpFzOv0r64lQJX2iBWtAkTB4Nr_u9IVHnOlXhXE3tBSLze-n_JtDUBz4/file?_download_id=849163895927911160232479647098681833552512786098552494411398777&_log_download_success=1#";
