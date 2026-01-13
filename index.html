@@ -6,166 +6,62 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  width: 100%;
-  height: 100%;
-  font-family: sans-serif;
-  background: #f6f4ef;
-}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; font-family:sans-serif; background:#f6f4ef; }
 
 /* ---------- FADE SYSTEM ---------- */
-
-.fade {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
-
-.fade.show {
-  opacity: 1;
-  pointer-events: auto;
-}
+.fade { opacity:0; pointer-events:none; transition:opacity 0.4s ease; }
+.fade.show { opacity:1; pointer-events:auto; }
 
 /* ---------- FRONT PAGE ---------- */
-
 #front {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 80px;
+  position: fixed; inset:0;
+  display:flex; justify-content:center; align-items:center; gap:80px;
 }
-
 .icon {
-  width: 200px;
-  cursor: pointer;
+  width:200px; cursor:pointer;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-
-.icon:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-}
+.icon:hover { transform: scale(1.05); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
 
 /* ---------- ZINE ---------- */
-
-#zine {
-  position: fixed;
-  inset: 0;
-  background: #111;
-}
-
+#zine { position:fixed; inset:0; background:#111; }
 #back {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  color: white;
-  opacity: 0.5;
-  cursor: pointer;
-  z-index: 20;
-  transition: opacity 0.2s ease;
+  position:absolute; top:20px; left:20px; color:white; opacity:0.5; cursor:pointer; z-index:20; transition:opacity 0.2s ease;
 }
-
-#back:hover {
-  opacity: 1;
-}
-
-#page-container {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+#back:hover { opacity:1; }
+#page-container { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; }
 
 /* pages */
-.page {
-  position: absolute;
-  max-width: 90vw;
-  max-height: 90vh;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
+.page { position:absolute; max-width:90vw; max-height:90vh; opacity:0; transition:opacity 0.4s ease; }
+.page.active { opacity:1; }
 
-.page.active {
-  opacity: 1;
-}
-
-/* video */
-.video iframe {
-  width: 80vw;
-  height: 45vw;
-  max-width: 960px;
-  max-height: 540px;
-  border: none;
-}
+/* video page */
+.video-page iframe { width:80vw; height:45vw; max-width:960px; max-height:540px; border:none; }
 
 /* arrows */
 .arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 48px;
-  color: white;
-  cursor: pointer;
-  opacity: 0.6;
-  user-select: none;
-  z-index: 20;
+  position:absolute; top:50%; transform:translateY(-50%); font-size:48px; color:white; cursor:pointer; opacity:0.6; user-select:none; z-index:20;
 }
-
-.arrow:hover {
-  opacity: 1;
-}
-
-#prev { left: 20px; }
-#next { right: 20px; }
+.arrow:hover { opacity:1; }
+#prev{ left:20px; } #next{ right:20px; }
 
 /* dots */
-#dots {
-  position: absolute;
-  bottom: 30px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #555;
-}
-
-.dot.active {
-  background: white;
-}
+#dots { position:absolute; bottom:30px; width:100%; display:flex; justify-content:center; gap:10px; }
+.dot { width:8px; height:8px; border-radius:50%; background:#555; }
+.dot.active { background:white; }
 
 /* mobile */
-@media (max-width: 768px) {
-  #front {
-    flex-direction: column;
-    gap: 40px;
-  }
-
-  .video iframe {
-    width: 90vw;
-    height: 50vw;
-  }
+@media (max-width:768px) { 
+  #front { flex-direction:column; gap:40px; }
+  .video-page iframe { width:90vw; height:50vw; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- hidden iframe for downloads -->
+<!-- hidden iframe for Dropbox download -->
 <iframe id="downloadFrame" style="display:none;"></iframe>
 
 <!-- FRONT -->
@@ -177,12 +73,9 @@ html, body {
 <!-- ZINE -->
 <div id="zine" class="fade">
   <div id="back">← back</div>
-
   <div id="page-container"></div>
-
   <div id="prev" class="arrow">‹</div>
   <div id="next" class="arrow">›</div>
-
   <div id="dots"></div>
 </div>
 
@@ -192,108 +85,96 @@ const zine = document.getElementById("zine");
 const container = document.getElementById("page-container");
 const dots = document.getElementById("dots");
 
-const TOTAL_PAGES = 9; // 8 images + 1 video
+const totalPages = 9; // 8 images + 1 video
 let current = 0;
 const pages = [];
+let videoIframe = null;
 
-/* ---------- BUILD IMAGE PAGES ---------- */
-for (let i = 1; i <= 8; i++) {
+/* ---------- IMAGE PAGES 1–8 ---------- */
+for(let i=1;i<=8;i++){
   const img = document.createElement("img");
-  img.src = `page${String(i).padStart(2, "0")}.png`;
-  img.className = "page";
-  if (i === 1) img.classList.add("active");
+  img.src = `page${String(i).padStart(2,"0")}.png`;
+  img.className="page";
+  if(i===1) img.classList.add("active");
   container.appendChild(img);
   pages.push(img);
 
   const dot = document.createElement("div");
-  dot.className = "dot" + (i === 1 ? " active" : "");
+  dot.className = "dot"+(i===1?" active":"");
   dots.appendChild(dot);
 }
 
-/* ---------- VIDEO PAGE (EMPTY UNTIL ACTIVE) ---------- */
+/* ---------- VIDEO PAGE 9 ---------- */
 const videoPage = document.createElement("div");
-videoPage.className = "page video";
+videoPage.className="page video-page";
+videoPage.innerHTML=`
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/watch?v=PzruFL1rGsU?enablejsapi=1"
+    title="video"
+    allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen>
+  </iframe>
+`;
 container.appendChild(videoPage);
 pages.push(videoPage);
 
 const videoDot = document.createElement("div");
-videoDot.className = "dot";
+videoDot.className="dot";
 dots.appendChild(videoDot);
 
-/* ---------- PAGE SWITCHING ---------- */
-function showPage(i) {
-  // remove current
+videoIframe = videoPage.querySelector("iframe");
+
+/* ---------- SHOW PAGE ---------- */
+function showPage(i){
+  // stop video if leaving page 9
+  if(current===8 && videoIframe) videoIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}','*');
+
   pages[current].classList.remove("active");
   dots.children[current].classList.remove("active");
-
-  // if leaving video page, destroy iframe
-  if (current === 8) {
-    videoPage.innerHTML = "";
-  }
-
-  current = i;
-
-  // if entering video page, create iframe
-  if (current === 8) {
-    videoPage.innerHTML = `
-      <iframe
-        src="https://www.youtube-nocookie.com/embed/watch?v=PzruFL1rGsU"
-        title="video"
-        allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allowfullscreen>
-      </iframe>
-    `;
-  }
-
+  current=i;
   pages[current].classList.add("active");
   dots.children[current].classList.add("active");
 }
 
 /* ---------- OPEN ZINE ---------- */
-document.getElementById("openZine").onclick = () => {
+document.getElementById("openZine").onclick = ()=>{
   front.classList.remove("show");
-  setTimeout(() => {
-    front.style.display = "none";
-    zine.style.display = "block";
+  setTimeout(()=>{
+    front.style.display="none";
+    zine.style.display="block";
     zine.classList.add("show");
-    current = 0;
+    current=0;
     showPage(0);
-  }, 400);
+  },400);
 };
 
-/* ---------- BACK ---------- */
-document.getElementById("back").onclick = () => {
+/* ---------- BACK BUTTON ---------- */
+document.getElementById("back").onclick = ()=>{
   zine.classList.remove("show");
-  setTimeout(() => {
-    zine.style.display = "none";
-    front.style.display = "flex";
+  setTimeout(()=>{
+    zine.style.display="none";
+    front.style.display="flex";
     front.classList.add("show");
-  }, 400);
+  },400);
 };
 
-/* ---------- NAV ---------- */
-document.getElementById("next").onclick = () => {
-  if (current < TOTAL_PAGES - 1) showPage(current + 1);
-};
-
-document.getElementById("prev").onclick = () => {
-  if (current > 0) showPage(current - 1);
-};
+/* ---------- ARROWS ---------- */
+document.getElementById("next").onclick = ()=>{ if(current<totalPages-1) showPage(current+1); };
+document.getElementById("prev").onclick = ()=>{ if(current>0) showPage(current-1); };
 
 /* ---------- SWIPE ---------- */
-let startX = 0;
-container.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-container.addEventListener("touchend", e => {
-  const dx = e.changedTouches[0].clientX - startX;
-  if (dx > 50 && current > 0) showPage(current - 1);
-  if (dx < -50 && current < TOTAL_PAGES - 1) showPage(current + 1);
+let startX=0;
+container.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
+container.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-startX;
+  if(dx>50 && current>0) showPage(current-1);
+  if(dx<-50 && current<totalPages-1) showPage(current+1);
 });
 
-/* ---------- DOWNLOAD ---------- */
-document.getElementById("downloadBtn").onclick = () => {
-  document.getElementById("downloadFrame").src =
-    "https://uc632625ed95ccaf7377f9e70e4f.dl.dropboxusercontent.com/cd/0/get/C40xDBUPVs6M8vxE-eGTHwi7i4vFnOxiy8AxOkrPSdoKi0avq0hutCJ50aqVNx0zX9fXWQv5m8v7iJE0Ku4EGDF-xgmnL3O0i9cgRUZVFsCcJKxr6FExZp5RxU7eVkCihypqJbZGgSOrpFzOv0r64lQJX2iBWtAkTB4Nr_u9IVHnOlXhXE3tBSLze-n_JtDUBz4/file?_download_id=849163895927911160232479647098681833552512786098552494411398777&_log_download_success=1#";
+/* ---------- DOWNLOAD BUTTON (DROPBOX) ---------- */
+document.getElementById("downloadBtn").onclick = ()=>{
+  document.getElementById("downloadFrame").src="https://uc632625ed95ccaf7377f9e70e4f.dl.dropboxusercontent.com/cd/0/get/C40xDBUPVs6M8vxE-eGTHwi7i4vFnOxiy8AxOkrPSdoKi0avq0hutCJ50aqVNx0zX9fXWQv5m8v7iJE0Ku4EGDF-xgmnL3O0i9cgRUZVFsCcJKxr6FExZp5RxU7eVkCihypqJbZGgSOrpFzOv0r64lQJX2iBWtAkTB4Nr_u9IVHnOlXhXE3tBSLze-n_JtDUBz4/file?_download_id=849163895927911160232479647098681833552512786098552494411398777&_log_download_success=1#";
 };
 </script>
 
